@@ -1,0 +1,29 @@
+[
+  {
+    "id": "incident-1",
+    "type": "traffic",
+    "description": "Heavy traffic on Orchard Road",
+    "coordinates": [103.831, 1.305],
+    "zone": "Orchard",
+    "severity": "high",
+    "timestamp": "2026-04-24T23:00:00Z"
+  },
+  {
+    "id": "incident-2",
+    "type": "weather",
+    "description": "Heavy rain affecting Tampines",
+    "coordinates": [103.945, 1.352],
+    "zone": "Tampines",
+    "severity": "medium",
+    "timestamp": "2026-04-24T22:30:00Z"
+  },
+  {
+    "id": "incident-3",
+    "type": "construction",
+    "description": "Road works in Jurong West",
+    "coordinates": [103.707, 1.339],
+    "zone": "Jurong West",
+    "severity": "low",
+    "timestamp": "2026-04-24T21:00:00Z"
+  }
+]
