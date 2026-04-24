@@ -411,6 +411,10 @@ function App() {
         });
         const map = await api.createMap(mapContainerRef.current, SINGAPORE_CENTER, 11);
 
+        if (!map?.on || !map?.addSource) {
+          throw new Error("No usable MapLibre map instance was returned.");
+        }
+
         if (isCancelled) {
           api.destroy();
           return;

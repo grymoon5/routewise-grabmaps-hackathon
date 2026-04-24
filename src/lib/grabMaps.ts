@@ -72,39 +72,63 @@ export class GrabMapsAPI {
     }
 
     if (grabMaps?.GrabMapsLib) {
-      this.instance = new grabMaps.GrabMapsLib({
-        container,
-        apiKey: this.apiKey,
-        baseUrl: this.baseUrl,
-        lng: center[0],
-        lat: center[1],
-        zoom,
-        navigation: true,
-        attribution: true,
-        showSearchBar: false,
-        showWaypointsModal: false,
-        showLayersMenu: false,
-      });
-      await waitForReady(this.instance);
-      this.client = this.instance.getClient?.();
-      this.usedLibrary = true;
-      return this.instance.getMap();
+      try {
+        this.instance = new grabMaps.GrabMapsLib({
+          container,
+          apiKey: this.apiKey,
+          baseUrl: this.baseUrl,
+          lng: center[0],
+          lat: center[1],
+          zoom,
+          navigation: true,
+          attribution: true,
+          showSearchBar: false,
+          showWaypointsModal: false,
+          showLayersMenu: false,
+        });
+        await waitForReady(this.instance);
+        const map = this.instance.getMap?.();
+
+        if (map?.on && map?.addSource) {
+          this.client = this.instance.getClient?.();
+          this.usedLibrary = true;
+          return map;
+        }
+
+        console.warn('GrabMapsLib did not return a MapLibre map; using fallback map.');
+        this.instance.destroy?.();
+        this.instance = null;
+      } catch (error) {
+        console.warn('GrabMapsLib map creation failed; using fallback map.', error);
+        this.instance?.destroy?.();
+        this.instance = null;
+      }
     }
 
     if (grabMaps?.GrabMapsBuilder && grabMaps?.MapBuilder) {
-      this.client = new grabMaps.GrabMapsBuilder()
-        .setBaseUrl(this.baseUrl)
-        .setApiKey(this.apiKey)
-        .build();
-      this.usedLibrary = true;
+      try {
+        this.client = new grabMaps.GrabMapsBuilder()
+          .setBaseUrl(this.baseUrl)
+          .setApiKey(this.apiKey)
+          .build();
 
-      return new grabMaps.MapBuilder(this.client)
-        .setContainer(container)
-        .setCenter(center)
-        .setZoom(zoom)
-        .enableNavigation()
-        .enableAttribution()
-        .build();
+        const map = new grabMaps.MapBuilder(this.client)
+          .setContainer(container)
+          .setCenter(center)
+          .setZoom(zoom)
+          .enableNavigation()
+          .enableAttribution()
+          .build();
+
+        if (map?.on && map?.addSource) {
+          this.usedLibrary = true;
+          return map;
+        }
+
+        console.warn('GrabMaps MapBuilder did not return a MapLibre map; using fallback map.');
+      } catch (error) {
+        console.warn('GrabMaps MapBuilder failed; using fallback map.', error);
+      }
     }
 
     const style = await fetchGrabMapsStyle(this.apiKey, this.baseUrl);
